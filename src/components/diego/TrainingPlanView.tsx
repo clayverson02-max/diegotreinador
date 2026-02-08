@@ -21,10 +21,26 @@ interface WorkoutDay {
 
 interface TrainingPlanViewProps {
   workoutDays: WorkoutDay[];
+  selectedDays?: string[];
   onDayComplete?: (dayIndex: number) => void;
 }
 
-export const TrainingPlanView = ({ workoutDays, onDayComplete }: TrainingPlanViewProps) => {
+const WEEKDAY_NAMES: Record<string, string> = {
+  segunda: "Seg",
+  terca: "Ter",
+  quarta: "Qua",
+  quinta: "Qui",
+  sexta: "Sex",
+  sabado: "Sáb",
+  domingo: "Dom",
+};
+
+const formatScheduledDate = (dateStr: string): string => {
+  const date = new Date(dateStr + "T12:00:00");
+  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+};
+
+export const TrainingPlanView = ({ workoutDays, selectedDays, onDayComplete }: TrainingPlanViewProps) => {
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
   const { 
     progress, 
@@ -32,15 +48,32 @@ export const TrainingPlanView = ({ workoutDays, onDayComplete }: TrainingPlanVie
     completeDay, 
     isDayUnlocked, 
     isDayCompleted,
-    getNextAvailableDay 
+    getNextAvailableDay,
+    resetProgress,
   } = useTrainingProgress();
 
-  // Initialize progress when workout days are loaded
+  // Initialize or reset progress when workout days or selected days change
   useEffect(() => {
-    if (workoutDays.length > 0 && !progress) {
-      initializeProgress(workoutDays.map(d => d.dayName));
+    if (workoutDays.length > 0) {
+      // Se não há progresso, inicializar
+      if (!progress) {
+        initializeProgress(workoutDays.map(d => d.dayName), selectedDays);
+        return;
+      }
+      
+      // Se os dias selecionados mudaram, reiniciar progresso
+      const currentSelectedDays = progress.selectedDays || [];
+      const newSelectedDays = selectedDays || [];
+      const daysChanged = JSON.stringify(currentSelectedDays.sort()) !== JSON.stringify([...newSelectedDays].sort());
+      
+      if (daysChanged && newSelectedDays.length > 0) {
+        resetProgress();
+        setTimeout(() => {
+          initializeProgress(workoutDays.map(d => d.dayName), selectedDays);
+        }, 100);
+      }
     }
-  }, [workoutDays, progress]);
+  }, [workoutDays, progress, selectedDays]);
 
   const handleDayClick = (index: number) => {
     const dayId = `day_${index}`;
@@ -105,27 +138,33 @@ export const TrainingPlanView = ({ workoutDays, onDayComplete }: TrainingPlanVie
           const isCompleted = isDayCompleted(dayId);
           const isUnlocked = isDayUnlocked(dayId);
           const isActive = activeDayIndex === index;
+          const progressDay = progress?.days[index];
+          const weekDayLabel = progressDay?.weekDay ? WEEKDAY_NAMES[progressDay.weekDay] : "";
+          const dateLabel = progressDay?.scheduledDate ? formatScheduledDate(progressDay.scheduledDate) : "";
           
           return (
             <button
               key={index}
               onClick={() => handleDayClick(index)}
               className={`
-                flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all
+                flex-shrink-0 flex flex-col items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium transition-all min-w-[80px]
                 ${isActive ? 'diego-gradient text-primary-foreground scale-105' : ''}
                 ${isCompleted && !isActive ? 'bg-diego-success/20 text-diego-success border border-diego-success/30' : ''}
                 ${!isUnlocked && !isCompleted ? 'bg-muted/50 text-muted-foreground cursor-not-allowed' : ''}
                 ${isUnlocked && !isCompleted && !isActive ? 'bg-secondary text-secondary-foreground hover:bg-muted' : ''}
               `}
             >
-              {isCompleted ? (
-                <CheckCircle2 size={16} />
-              ) : !isUnlocked ? (
-                <Lock size={14} />
-              ) : (
-                <Calendar size={16} />
-              )}
-              <span>Dia {index + 1}</span>
+              <div className="flex items-center gap-1">
+                {isCompleted ? (
+                  <CheckCircle2 size={14} />
+                ) : !isUnlocked ? (
+                  <Lock size={12} />
+                ) : (
+                  <Calendar size={14} />
+                )}
+                <span>{weekDayLabel || `Dia ${index + 1}`}</span>
+              </div>
+              <span className="text-xs opacity-80">{dateLabel}</span>
             </button>
           );
         })}

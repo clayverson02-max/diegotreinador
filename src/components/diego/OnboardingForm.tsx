@@ -23,13 +23,23 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
     objetivo: "",
     nivel: "",
     diasSemana: "",
+    diasEspecificos: [],
     local: "",
     limitacoes: "",
     alimentacao: "",
   });
 
-  const updateProfile = (field: keyof UserProfile, value: string) => {
+  const updateProfile = (field: keyof UserProfile, value: string | string[]) => {
     setProfile((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const toggleDiaEspecifico = (dia: string) => {
+    setProfile((prev) => {
+      const dias = prev.diasEspecificos.includes(dia)
+        ? prev.diasEspecificos.filter(d => d !== dia)
+        : [...prev.diasEspecificos, dia];
+      return { ...prev, diasEspecificos: dias, diasSemana: dias.length.toString() };
+    });
   };
 
   const nextStep = () => {
@@ -48,7 +58,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
       case 2:
         return profile.objetivo && profile.nivel;
       case 3:
-        return profile.diasSemana && profile.local;
+        return profile.diasEspecificos.length >= 2 && profile.local;
       case 4:
         return true;
       default:
@@ -201,23 +211,38 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
           <div className="space-y-4">
             <div>
               <label className="text-sm text-muted-foreground mb-2 block">
-                Quantos dias por semana pode treinar?
+                Quais dias da semana você pode treinar?
               </label>
-              <div className="grid grid-cols-5 gap-2">
-                {["2", "3", "4", "5", "6"].map((dias) => (
+              <p className="text-xs text-muted-foreground mb-3">
+                Selecione pelo menos 2 dias
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: "segunda", label: "Segunda-feira" },
+                  { value: "terca", label: "Terça-feira" },
+                  { value: "quarta", label: "Quarta-feira" },
+                  { value: "quinta", label: "Quinta-feira" },
+                  { value: "sexta", label: "Sexta-feira" },
+                  { value: "sabado", label: "Sábado" },
+                ].map((dia) => (
                   <button
-                    key={dias}
-                    onClick={() => updateProfile("diasSemana", dias)}
-                    className={`py-3 px-4 rounded-xl text-sm font-medium transition-all ${
-                      profile.diasSemana === dias
+                    key={dia.value}
+                    onClick={() => toggleDiaEspecifico(dia.value)}
+                    className={`py-3 px-4 rounded-xl text-sm font-medium transition-all text-left ${
+                      profile.diasEspecificos.includes(dia.value)
                         ? "diego-gradient text-primary-foreground"
                         : "bg-secondary text-secondary-foreground hover:bg-muted"
                     }`}
                   >
-                    {dias}x
+                    {dia.label}
                   </button>
                 ))}
               </div>
+              {profile.diasEspecificos.length > 0 && (
+                <p className="text-sm text-primary mt-3">
+                  ✓ {profile.diasEspecificos.length} dia{profile.diasEspecificos.length > 1 ? 's' : ''} selecionado{profile.diasEspecificos.length > 1 ? 's' : ''}
+                </p>
+              )}
             </div>
             <div>
               <label className="text-sm text-muted-foreground mb-2 block">Onde vai treinar?</label>

@@ -6,6 +6,7 @@ export interface UserProfile {
   objetivo: string;
   nivel: 'iniciante' | 'intermediario' | '';
   diasSemana: string;
+  diasEspecificos: string[]; // Dias específicos selecionados (segunda, terça, etc.)
   local: 'academia' | 'casa' | '';
   limitacoes: string;
   alimentacao: string;
