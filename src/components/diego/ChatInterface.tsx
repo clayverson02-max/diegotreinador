@@ -3,18 +3,19 @@ import { Message, UserProfile } from "@/types/diego";
 import { ChatMessage } from "./ChatMessage";
 import { TrainingPlanView } from "./TrainingPlanView";
 import { DiegoAvatar } from "./DiegoAvatar";
-import { Send, Dumbbell, MessageCircle } from "lucide-react";
+import { Send, Dumbbell, MessageCircle, ArrowRight, Sparkles } from "lucide-react";
 import { streamDiegoChat } from "@/lib/diegoAI";
 import { parseWorkoutPlan, hasWorkoutPlan, ParsedWorkoutDay } from "@/lib/parseWorkoutPlan";
 import { toast } from "sonner";
 
 interface ChatInterfaceProps {
   profile: UserProfile;
+  onSwitchToTraining?: () => void;
 }
 
 type ViewMode = "chat" | "training";
 
-export const ChatInterface = ({ profile }: ChatInterfaceProps) => {
+export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -191,7 +192,8 @@ export const ChatInterface = ({ profile }: ChatInterfaceProps) => {
       {viewMode === "training" && workoutDays.length > 0 ? (
         <div className="flex-1 overflow-y-auto p-4">
           <TrainingPlanView 
-            workoutDays={workoutDays} 
+            workoutDays={workoutDays}
+            selectedDays={profile.diasEspecificos}
             onDayComplete={handleDayComplete}
           />
         </div>
@@ -210,6 +212,29 @@ export const ChatInterface = ({ profile }: ChatInterfaceProps) => {
                   <span className="w-2 h-2 bg-primary rounded-full pulse-animation" />
                   <span className="w-2 h-2 bg-primary rounded-full pulse-animation" style={{ animationDelay: "0.2s" }} />
                   <span className="w-2 h-2 bg-primary rounded-full pulse-animation" style={{ animationDelay: "0.4s" }} />
+                </div>
+              </div>
+            )}
+
+            {/* CTA para ir aos treinos */}
+            {planGenerated && workoutDays.length > 0 && viewMode === "chat" && (
+              <div 
+                onClick={() => setViewMode("training")}
+                className="diego-card cursor-pointer hover:scale-[1.02] transition-transform border-2 border-primary/30 bg-gradient-to-r from-primary/10 to-accent/10"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full diego-gradient flex items-center justify-center">
+                    <Sparkles className="text-primary-foreground" size={24} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-display font-bold text-foreground">
+                      Seu plano está pronto! 🎉
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Toque em "Meus Treinos" para começar
+                    </p>
+                  </div>
+                  <ArrowRight className="text-primary" size={24} />
                 </div>
               </div>
             )}
