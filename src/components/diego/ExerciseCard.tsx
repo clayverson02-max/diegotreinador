@@ -1,12 +1,56 @@
+import { useState, useEffect } from "react";
 import { Exercise } from "@/types/diego";
-import { MapPin, Brain, AlertTriangle, RefreshCw, Timer, Repeat } from "lucide-react";
+import { MapPin, Brain, AlertTriangle, RefreshCw, Timer, Repeat, ImageIcon, Loader2 } from "lucide-react";
 
 interface ExerciseCardProps {
   exercise: Exercise;
   index: number;
+  showImage?: boolean;
 }
 
-export const ExerciseCard = ({ exercise, index }: ExerciseCardProps) => {
+const IMAGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-exercise-image`;
+
+export const ExerciseCard = ({ exercise, index, showImage = false }: ExerciseCardProps) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(exercise.imagem || null);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    if (showImage && !imageUrl && !isLoadingImage && !imageError) {
+      generateImage();
+    }
+  }, [showImage]);
+
+  const generateImage = async () => {
+    setIsLoadingImage(true);
+    try {
+      const resp = await fetch(IMAGE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          exerciseName: exercise.nome,
+          equipment: exercise.maquina,
+          targetMuscle: exercise.nome,
+        }),
+      });
+
+      const data = await resp.json();
+      if (data.imageUrl) {
+        setImageUrl(data.imageUrl);
+      } else {
+        setImageError(true);
+      }
+    } catch (error) {
+      console.error("Error generating image:", error);
+      setImageError(true);
+    } finally {
+      setIsLoadingImage(false);
+    }
+  };
+
   return (
     <div className="exercise-card slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
       {/* Header */}
@@ -19,14 +63,27 @@ export const ExerciseCard = ({ exercise, index }: ExerciseCardProps) => {
         </h4>
       </div>
 
-      {/* Image placeholder */}
-      {exercise.imagem && (
-        <div className="mb-4 rounded-xl overflow-hidden">
-          <img 
-            src={exercise.imagem} 
-            alt={exercise.nome}
-            className="w-full h-48 object-cover"
-          />
+      {/* Exercise Image */}
+      {showImage && (
+        <div className="mb-4 rounded-xl overflow-hidden bg-muted/30 aspect-video flex items-center justify-center">
+          {isLoadingImage ? (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <Loader2 size={24} className="animate-spin" />
+              <span className="text-xs">Gerando imagem...</span>
+            </div>
+          ) : imageUrl ? (
+            <img 
+              src={imageUrl} 
+              alt={exercise.nome}
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <ImageIcon size={32} />
+              <span className="text-xs">Imagem indisponível</span>
+            </div>
+          )}
         </div>
       )}
 
