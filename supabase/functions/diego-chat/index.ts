@@ -26,13 +26,26 @@ FORMATO VISUAL (100% MOBILE):
 
 Você escreve como quem orienta alguém ao lado na academia.
 
+INTELIGÊNCIA DE DIVISÃO DE TREINO:
+Baseado no número de dias disponíveis, divida o treino de forma INTELIGENTE:
+- 1 dia: Full Body (corpo todo)
+- 2 dias: Superior/Inferior ou Push/Pull
+- 3 dias: ABC (Push/Pull/Legs ou divisão clássica)
+- 4 dias: ABCD (Peito+Tríceps / Costas+Bíceps / Ombros+Core / Pernas)
+- 5 dias: ABCDE (um grupo muscular principal por dia)
+- 6 dias: PPL 2x (Push/Pull/Legs repetido)
+
+IMPORTANTE: Monte o treino APENAS para os dias específicos informados pelo usuário.
+Se o usuário selecionou Segunda, Quarta e Sexta, monte treino APENAS para esses dias.
+Defina um OBJETIVO CLARO para cada dia baseado na divisão inteligente.
+
 ESTRUTURA OBRIGATÓRIA PARA TREINOS:
 Quando entregar treino, você DEVE usar EXATAMENTE este formato:
 
 ## 📅 ROTINA DE TREINO DA SEMANA
 
 ### Segunda-feira
-**Peito e Tríceps**
+**Peito e Tríceps** (Objetivo: Força e hipertrofia da parte superior frontal)
 
 🏋️ **Exercício 1: Supino reto com halteres**
 📍 Máquina: Banco reto + par de halteres
@@ -46,7 +59,7 @@ Quando entregar treino, você DEVE usar EXATAMENTE este formato:
 ⚠️ Erro comum: Arquear demais as costas
 🔄 Alternativa: Flexão de braços no chão
 
-(Repita este formato para cada exercício)
+(Repita este formato para cada exercício - mínimo 4 exercícios por dia)
 
 ---
 
@@ -79,6 +92,21 @@ serve(async (req) => {
     // Build context from profile if provided
     let profileContext = "";
     if (profile) {
+      // Map day codes to full names
+      const dayNames: Record<string, string> = {
+        segunda: "Segunda-feira",
+        terca: "Terça-feira",
+        quarta: "Quarta-feira",
+        quinta: "Quinta-feira",
+        sexta: "Sexta-feira",
+        sabado: "Sábado",
+        domingo: "Domingo",
+      };
+      
+      const diasEspecificos = profile.diasEspecificos || [];
+      const diasFormatados = diasEspecificos.map((d: string) => dayNames[d] || d).join(", ");
+      const numDias = diasEspecificos.length || parseInt(profile.diasSemana) || 3;
+      
       profileContext = `
 
 PERFIL DO ALUNO:
@@ -86,14 +114,22 @@ PERFIL DO ALUNO:
 - Altura: ${profile.altura}cm
 - Peso: ${profile.peso}kg
 - Sexo: ${profile.sexo}
-- Objetivo: ${profile.objetivo}
+- Objetivo principal: ${profile.objetivo}
 - Nível: ${profile.nivel === "iniciante" ? "Iniciante total" : "Intermediário"}
-- Dias disponíveis: ${profile.diasSemana}x por semana
+- DIAS ESPECÍFICOS SELECIONADOS: ${diasFormatados || profile.diasSemana + "x por semana"}
+- Quantidade de dias: ${numDias}
 - Local: ${profile.local === "academia" ? "Academia" : "Em casa"}
 - Limitações: ${profile.limitacoes || "Nenhuma informada"}
 - Alimentação atual: ${profile.alimentacao || "Não informada"}
 
-Com base neste perfil, ${type === "plan" ? "monte um PLANO COMPLETO personalizado incluindo: 1) Rotina de treino semanal detalhada com exercícios usando o formato estruturado obrigatório. 2) Plano alimentar com café, almoço, jantar e lanches. 3) Dicas de rotina e hábitos." : "responda à pergunta do aluno de forma personalizada."}`;
+INSTRUÇÕES ESPECIAIS:
+1. Monte treino APENAS para os dias: ${diasFormatados}
+2. Use a divisão inteligente baseada em ${numDias} dia(s) disponível(is)
+3. Defina um OBJETIVO ESPECÍFICO para cada dia (ex: "Força de pernas", "Hipertrofia de peito")
+4. Adapte os exercícios para ${profile.local === "academia" ? "equipamentos de academia" : "exercícios em casa com pouco ou nenhum equipamento"}
+${profile.limitacoes ? `5. IMPORTANTE: Evite exercícios que possam agravar: ${profile.limitacoes}` : ""}
+
+${type === "plan" ? "Monte um PLANO COMPLETO personalizado incluindo: 1) Rotina de treino semanal detalhada APENAS para os dias selecionados, com exercícios usando o formato estruturado obrigatório e OBJETIVO claro por dia. 2) Plano alimentar com café, almoço, jantar e lanches. 3) Dicas de rotina e hábitos." : "Responda à pergunta do aluno de forma personalizada."}`
     }
 
     const systemMessage = {
