@@ -58,7 +58,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
       case 2:
         return profile.objetivo && profile.nivel;
       case 3:
-        return profile.diasEspecificos.length >= 2 && profile.local;
+        return profile.diasEspecificos.length >= 1 && profile.local;
       case 4:
         return true;
       default:
@@ -214,7 +214,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
                 Quais dias da semana você pode treinar?
               </label>
               <p className="text-xs text-muted-foreground mb-3">
-                Selecione pelo menos 2 dias
+                Selecione os dias disponíveis
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {[
