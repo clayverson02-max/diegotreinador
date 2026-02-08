@@ -1,20 +1,26 @@
 import { useState, useRef, useEffect } from "react";
 import { Message, UserProfile } from "@/types/diego";
 import { ChatMessage } from "./ChatMessage";
+import { TrainingPlanView } from "./TrainingPlanView";
 import { DiegoAvatar } from "./DiegoAvatar";
-import { Send } from "lucide-react";
+import { Send, Dumbbell, MessageCircle } from "lucide-react";
 import { streamDiegoChat } from "@/lib/diegoAI";
+import { parseWorkoutPlan, hasWorkoutPlan, ParsedWorkoutDay } from "@/lib/parseWorkoutPlan";
 import { toast } from "sonner";
 
 interface ChatInterfaceProps {
   profile: UserProfile;
 }
 
+type ViewMode = "chat" | "training";
+
 export const ChatInterface = ({ profile }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [planGenerated, setPlanGenerated] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("chat");
+  const [workoutDays, setWorkoutDays] = useState<ParsedWorkoutDay[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -54,6 +60,14 @@ export const ChatInterface = ({ profile }: ChatInterfaceProps) => {
         onDone: () => {
           setIsTyping(false);
           setPlanGenerated(true);
+          
+          // Try to parse workout plan from response
+          if (hasWorkoutPlan(fullContent)) {
+            const parsed = parseWorkoutPlan(fullContent);
+            if (parsed && parsed.length > 0) {
+              setWorkoutDays(parsed);
+            }
+          }
         },
         onError: (error) => {
           setIsTyping(false);
@@ -115,6 +129,14 @@ export const ChatInterface = ({ profile }: ChatInterfaceProps) => {
       },
       onDone: () => {
         setIsTyping(false);
+        
+        // Check if new workout plan was generated
+        if (hasWorkoutPlan(fullContent)) {
+          const parsed = parseWorkoutPlan(fullContent);
+          if (parsed && parsed.length > 0) {
+            setWorkoutDays(parsed);
+          }
+        }
       },
       onError: (error) => {
         setIsTyping(false);
@@ -130,49 +152,94 @@ export const ChatInterface = ({ profile }: ChatInterfaceProps) => {
     });
   };
 
+  const handleDayComplete = (dayIndex: number) => {
+    // Could add additional tracking here
+    console.log(`Day ${dayIndex} completed`);
+  };
+
   return (
     <div className="flex flex-col h-full max-w-2xl mx-auto">
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <ChatMessage key={message.id} message={message} />
-        ))}
-
-        {isTyping && messages[messages.length - 1]?.content === "" && (
-          <div className="flex items-center gap-3">
-            <DiegoAvatar size="sm" />
-            <div className="diego-message-diego flex items-center gap-2">
-              <span className="w-2 h-2 bg-primary rounded-full pulse-animation" />
-              <span className="w-2 h-2 bg-primary rounded-full pulse-animation" style={{ animationDelay: "0.2s" }} />
-              <span className="w-2 h-2 bg-primary rounded-full pulse-animation" style={{ animationDelay: "0.4s" }} />
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input area */}
-      <div className="p-4 border-t border-border bg-background/80 backdrop-blur-sm">
-        <div className="flex gap-3">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            placeholder={planGenerated ? "Tem alguma dúvida? Pergunte ao Diego..." : "Aguarde o plano ser gerado..."}
-            disabled={!planGenerated || isTyping}
-            className="diego-input flex-1 disabled:opacity-50"
-          />
+      {/* View Toggle */}
+      {planGenerated && workoutDays.length > 0 && (
+        <div className="flex gap-2 p-4 border-b border-border">
           <button
-            onClick={handleSend}
-            disabled={!input.trim() || isTyping || !planGenerated}
-            className="diego-button-primary px-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setViewMode("chat")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              viewMode === "chat" 
+                ? "diego-gradient text-primary-foreground" 
+                : "bg-secondary text-secondary-foreground hover:bg-muted"
+            }`}
           >
-            <Send size={20} />
+            <MessageCircle size={16} />
+            Chat
+          </button>
+          <button
+            onClick={() => setViewMode("training")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              viewMode === "training" 
+                ? "diego-gradient text-primary-foreground" 
+                : "bg-secondary text-secondary-foreground hover:bg-muted"
+            }`}
+          >
+            <Dumbbell size={16} />
+            Meus Treinos
           </button>
         </div>
-      </div>
+      )}
+
+      {/* Content Area */}
+      {viewMode === "training" && workoutDays.length > 0 ? (
+        <div className="flex-1 overflow-y-auto p-4">
+          <TrainingPlanView 
+            workoutDays={workoutDays} 
+            onDayComplete={handleDayComplete}
+          />
+        </div>
+      ) : (
+        <>
+          {/* Messages area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map((message) => (
+              <ChatMessage key={message.id} message={message} />
+            ))}
+
+            {isTyping && messages[messages.length - 1]?.content === "" && (
+              <div className="flex items-center gap-3">
+                <DiegoAvatar size="sm" />
+                <div className="diego-message-diego flex items-center gap-2">
+                  <span className="w-2 h-2 bg-primary rounded-full pulse-animation" />
+                  <span className="w-2 h-2 bg-primary rounded-full pulse-animation" style={{ animationDelay: "0.2s" }} />
+                  <span className="w-2 h-2 bg-primary rounded-full pulse-animation" style={{ animationDelay: "0.4s" }} />
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input area */}
+          <div className="p-4 border-t border-border bg-background/80 backdrop-blur-sm">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                placeholder={planGenerated ? "Tem alguma dúvida? Pergunte ao Diego..." : "Aguarde o plano ser gerado..."}
+                disabled={!planGenerated || isTyping}
+                className="diego-input flex-1 disabled:opacity-50"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || isTyping || !planGenerated}
+                className="diego-button-primary px-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

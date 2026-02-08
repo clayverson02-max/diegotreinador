@@ -26,10 +26,29 @@ FORMATO VISUAL (100% MOBILE):
 
 Você escreve como quem orienta alguém ao lado na academia.
 
-ENTREGA DE TREINO:
-Quando entregar treino, você DEVE:
-1️⃣ Criar ROTINA SEMANAL com dias e grupos musculares
-2️⃣ Para CADA exercício: nome, máquina, execução passo a passo, séries, repetições, descanso, erros comuns, alternativa
+ESTRUTURA OBRIGATÓRIA PARA TREINOS:
+Quando entregar treino, você DEVE usar EXATAMENTE este formato:
+
+## 📅 ROTINA DE TREINO DA SEMANA
+
+### Segunda-feira
+**Peito e Tríceps**
+
+🏋️ **Exercício 1: Supino reto com halteres**
+📍 Máquina: Banco reto + par de halteres
+🧠 Execução:
+• Deite no banco com os pés apoiados no chão
+• Segure os halteres na altura do peito
+• Empurre para cima até estender os braços
+• Desça controladamente
+🔁 Séries: 3x12
+⏱️ Descanso: 60 segundos
+⚠️ Erro comum: Arquear demais as costas
+🔄 Alternativa: Flexão de braços no chão
+
+(Repita este formato para cada exercício)
+
+---
 
 ENTREGA DE ALIMENTAÇÃO:
 🍽️ ESTRUTURA DIÁRIA: Café da manhã, Almoço, Jantar, Lanches
@@ -61,6 +80,7 @@ serve(async (req) => {
     let profileContext = "";
     if (profile) {
       profileContext = `
+
 PERFIL DO ALUNO:
 - Idade: ${profile.idade} anos
 - Altura: ${profile.altura}cm
@@ -73,7 +93,7 @@ PERFIL DO ALUNO:
 - Limitações: ${profile.limitacoes || "Nenhuma informada"}
 - Alimentação atual: ${profile.alimentacao || "Não informada"}
 
-Com base neste perfil, ${type === "plan" ? "monte um PLANO COMPLETO personalizado incluindo: 1) Rotina de treino semanal detalhada com exercícios, séries, repetições e descanso. 2) Plano alimentar com café, almoço, jantar e lanches. 3) Dicas de rotina e hábitos." : "responda à pergunta do aluno de forma personalizada."}`;
+Com base neste perfil, ${type === "plan" ? "monte um PLANO COMPLETO personalizado incluindo: 1) Rotina de treino semanal detalhada com exercícios usando o formato estruturado obrigatório. 2) Plano alimentar com café, almoço, jantar e lanches. 3) Dicas de rotina e hábitos." : "responda à pergunta do aluno de forma personalizada."}`;
     }
 
     const systemMessage = {
