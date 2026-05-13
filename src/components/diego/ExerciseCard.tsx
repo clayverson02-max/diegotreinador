@@ -16,9 +16,10 @@ export const ExerciseCard = ({ exercise, index, showImage = false }: ExerciseCar
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    if (showImage && !imageUrl && !isLoadingImage && !imageError) {
+    if (showImage && !imageUrl && !isLoadingImage) {
       generateImage();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showImage]);
 
   const generateImage = async () => {
