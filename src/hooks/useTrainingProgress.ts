@@ -115,7 +115,7 @@ export const useTrainingProgress = () => {
         dayId: `day_${i}`,
         dayName: dayNames[i],
         completedAt: null,
-        isLocked: i > 0, // Primeiro dia desbloqueado
+        isLocked: false, // Todos os dias liberados
         scheduledDate: scheduledDate.toISOString().split("T")[0],
         weekDay: weekDay,
       });
