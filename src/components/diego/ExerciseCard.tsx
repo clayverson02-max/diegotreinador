@@ -24,6 +24,7 @@ export const ExerciseCard = ({ exercise, index, showImage = false }: ExerciseCar
 
   const generateImage = async () => {
     setIsLoadingImage(true);
+    setImageError(false);
     try {
       const resp = await fetch(IMAGE_URL, {
         method: "POST",
