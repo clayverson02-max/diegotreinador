@@ -5,7 +5,7 @@ import { TrainingPlanView } from "./TrainingPlanView";
 import { DiegoAvatar } from "./DiegoAvatar";
 import { Send, Dumbbell, MessageCircle, ArrowRight, Sparkles } from "lucide-react";
 import { streamDiegoChat } from "@/lib/diegoAI";
-import { parseWorkoutPlan, hasWorkoutPlan, ParsedWorkoutDay } from "@/lib/parseWorkoutPlan";
+import { ParsedWorkoutDay } from "@/lib/parseWorkoutPlan";
 import { buildReliableWorkoutPlan } from "@/lib/workoutPlanBuilder";
 import { toast } from "sonner";
 
@@ -25,16 +25,7 @@ export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProp
   const [workoutDays, setWorkoutDays] = useState<ParsedWorkoutDay[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const getStableWorkoutPlan = (aiContent?: string): ParsedWorkoutDay[] => {
-    const fallbackPlan = buildReliableWorkoutPlan(profile);
-    if (!aiContent || !hasWorkoutPlan(aiContent)) return fallbackPlan;
-
-    const parsed = parseWorkoutPlan(aiContent);
-    const selectedCount = profile.diasEspecificos.length || Number(profile.diasSemana) || fallbackPlan.length;
-    const parsedIsComplete = parsed?.length === selectedCount && parsed.every((day) => day.exercises.length >= 4);
-
-    return parsedIsComplete ? parsed : fallbackPlan;
-  };
+  const getStableWorkoutPlan = (): ParsedWorkoutDay[] => buildReliableWorkoutPlan(profile);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -73,7 +64,7 @@ export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProp
         onDone: () => {
           setIsTyping(false);
           setPlanGenerated(true);
-          setWorkoutDays(getStableWorkoutPlan(fullContent));
+          setWorkoutDays(getStableWorkoutPlan());
         },
         onError: (error) => {
           setIsTyping(false);
@@ -138,10 +129,7 @@ export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProp
       onDone: () => {
         setIsTyping(false);
         
-        // Check if new workout plan was generated
-        if (hasWorkoutPlan(fullContent)) {
-          setWorkoutDays(getStableWorkoutPlan(fullContent));
-        }
+        setWorkoutDays(getStableWorkoutPlan());
       },
       onError: (error) => {
         setIsTyping(false);
