@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Exercise } from "@/types/diego";
 import { MapPin, Brain, AlertTriangle, RefreshCw, Timer, Repeat, ImageIcon, Loader2 } from "lucide-react";
 
@@ -49,6 +49,11 @@ export const ExerciseCard = ({ exercise, index, showImage = false }: ExerciseCar
   const [imageUrl, setImageUrl] = useState<string>(exercise.imagem || fallbackImage);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageUrl(exercise.imagem || fallbackImage);
+    setImageError(false);
+  }, [exercise.imagem, fallbackImage]);
 
   const generateImage = async () => {
     setIsLoadingImage(true);
