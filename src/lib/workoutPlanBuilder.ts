@@ -108,6 +108,8 @@ function exercise(name: string, equipment: string, steps: string[], sets: string
 }
 
 function normalizeDivision(division: string): string {
+  if (division === "Superior") return "Peito e Tríceps";
+  if (division === "Inferior") return "Pernas";
   if (division === "Push") return "Peito e Tríceps";
   if (division === "Pull") return "Costas e Bíceps";
   if (division === "Peito") return "Peito e Tríceps";
