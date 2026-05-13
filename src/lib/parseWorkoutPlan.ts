@@ -92,7 +92,7 @@ export function parseWorkoutPlan(content: string): ParsedWorkoutDay[] | null {
       
       // Extract exercise name (first line or before 📍)
       let name = "";
-      const nameMatch = cleanBlock.match(/^(?:\*\*)?(?:Exercício\s*\d+:?\s*)?([^📍🧠⚠️🔁⏱️🔄\n*]+?)(?:\*\*)?(?:\n|📍|$)/i);
+      const nameMatch = cleanBlock.match(/^(?:\*\*)?(?:Exercício\s*\d+:?\s*)?([\s\S]*?)(?:\*\*)?(?=\n|📍|🧠|⚠️|🔁|⏱️|🔄|$)/i);
       if (nameMatch) {
         name = nameMatch[1].trim().replace(/^\*\*|\*\*$/g, "");
       }
@@ -100,7 +100,7 @@ export function parseWorkoutPlan(content: string): ParsedWorkoutDay[] | null {
       if (!name || name.length < 3 || /^(segunda|terça|quarta|quinta|sexta|sábado|domingo|rotina|treino\s+da\s+semana)/i.test(name)) continue;
       
       // Extract equipment
-      const equipMatch = cleanBlock.match(/📍\s*(?:Máquina|Equipamento)?:?\s*([^\n🧠]+)/i);
+      const equipMatch = cleanBlock.match(/📍\s*(?:Máquina|Equipamento)?:?\s*([\s\S]*?)(?=\n|🧠|🔁|⏱️|⚠️|🔄|$)/i);
       const equipment = equipMatch?.[1]?.trim() || "Peso corporal";
       
       // Extract execution steps
@@ -112,19 +112,19 @@ export function parseWorkoutPlan(content: string): ParsedWorkoutDay[] | null {
         .filter(s => s && s.length > 3);
       
       // Extract sets
-      const setsMatch = cleanBlock.match(/🔁\s*(?:Séries|Série)?:?\s*([^\n⏱️⚠️🔄]+)/i);
+      const setsMatch = cleanBlock.match(/🔁\s*(?:Séries|Série)?:?\s*([\s\S]*?)(?=\n|⏱️|⚠️|🔄|$)/i);
       const sets = setsMatch?.[1]?.trim() || "3x12";
       
       // Extract rest
-      const restMatch = cleanBlock.match(/⏱️\s*(?:Descanso)?:?\s*([^\n⚠️🔄]+)/i);
+      const restMatch = cleanBlock.match(/⏱️\s*(?:Descanso)?:?\s*([\s\S]*?)(?=\n|⚠️|🔄|$)/i);
       const rest = restMatch?.[1]?.trim() || "60 segundos";
       
       // Extract common error
-      const errorMatch = cleanBlock.match(/⚠️\s*(?:Erro comum)?:?\s*([^\n🔄]+)/i);
+      const errorMatch = cleanBlock.match(/⚠️\s*(?:Erro comum)?:?\s*([\s\S]*?)(?=\n|🔄|$)/i);
       const commonError = errorMatch?.[1]?.trim() || "Executar sem controle";
       
       // Extract alternative
-      const altMatch = cleanBlock.match(/🔄\s*(?:Alternativa)?:?\s*([^\n🏋️]+)/i);
+      const altMatch = cleanBlock.match(/🔄\s*(?:Alternativa)?:?\s*([\s\S]*?)(?=\n|🏋️|$)/i);
       const alternative = altMatch?.[1]?.trim() || "Versão com peso corporal";
       
       exercises.push({
