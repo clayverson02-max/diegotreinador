@@ -159,22 +159,9 @@ export const useTrainingProgress = () => {
     setProgress({ ...progress, days: updatedDays });
   };
 
-  const isDayUnlocked = (dayId: string): boolean => {
-    if (!progress) return false;
-    
-    const day = progress.days.find(d => d.dayId === dayId);
-    if (!day) return false;
-    
-    // First day is always unlocked
-    if (day.dayId === "day_0") return true;
-    
-    // Check if the scheduled date has arrived
-    const today = new Date().toISOString().split("T")[0];
-    const dayIndex = progress.days.findIndex(d => d.dayId === dayId);
-    const previousDay = progress.days[dayIndex - 1];
-    
-    // Day is unlocked if previous day is completed AND scheduled date has arrived
-    return previousDay?.completedAt !== null && day.scheduledDate <= today;
+  const isDayUnlocked = (_dayId: string): boolean => {
+    // Todos os dias ficam disponíveis para o usuário acessar livremente
+    return true;
   };
 
   const isDayCompleted = (dayId: string): boolean => {
