@@ -45,7 +45,7 @@ const createExerciseIllustration = (exercise: Exercise) => {
 };
 
 export const ExerciseCard = ({ exercise, index, showImage = false }: ExerciseCardProps) => {
-  const fallbackImage = useMemo(() => createExerciseIllustration(exercise), [exercise.nome, exercise.maquina]);
+  const fallbackImage = useMemo(() => createExerciseIllustration(exercise), [exercise]);
   const [imageUrl, setImageUrl] = useState<string>(exercise.imagem || fallbackImage);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageError, setImageError] = useState(false);
