@@ -13,12 +13,26 @@ export interface ParsedWorkoutDay {
   }[];
 }
 
+const DAY_LABELS: Record<string, string> = {
+  segunda: "Segunda-feira",
+  terça: "Terça-feira",
+  quarta: "Quarta-feira",
+  quinta: "Quinta-feira",
+  sexta: "Sexta-feira",
+  sábado: "Sábado",
+  domingo: "Domingo",
+};
+
+function normalizeDayLabel(day: string): string {
+  return DAY_LABELS[day.toLowerCase()] || day;
+}
+
 export function parseWorkoutPlan(content: string): ParsedWorkoutDay[] | null {
   const days: ParsedWorkoutDay[] = [];
   
-  // More flexible day pattern matching
-  // Matches: "Segunda-feira (Treino A)", "Terça-feira (Treino B)", "### Segunda-feira", etc.
-  const dayRegex = /(?:#{1,3}\s*)?(?:\*\*)?(?:📅\s*)?(Segunda|Terça|Quarta|Quinta|Sexta|Sábado|Domingo)(?:-feira)?(?:\s*\((?:Treino\s*)?([A-Z]|[^)]+)\))?(?:\*\*)?/gi;
+  // Match only real day headers at the beginning of a line.
+  // This avoids treating mentions inside the text as new workout days.
+  const dayRegex = /(?:^|\n)\s*(?:#{1,4}\s*)?(?:\*\*)?(?:📅\s*)?(Segunda|Terça|Quarta|Quinta|Sexta|Sábado|Domingo)(?:-feira)?(?:\s*(?:\(|-|–|—|:)\s*([^\n*)]+)\)?)?(?:\*\*)?[^\n]*/gi;
   
   // Find all day headers with their positions
   const dayMatches: { match: RegExpExecArray; index: number }[] = [];
@@ -35,7 +49,7 @@ export function parseWorkoutPlan(content: string): ParsedWorkoutDay[] | null {
     const endIdx = i < dayMatches.length - 1 ? dayMatches[i + 1].index : content.length;
     const dayContent = content.slice(startIdx, endIdx);
     
-    const dayName = dayMatches[i].match[1];
+    const dayName = normalizeDayLabel(dayMatches[i].match[1]);
     
     // Extract muscle group - look for pattern after day name
     const muscleGroupMatch = dayContent.match(/(?:Treino\s*[A-Z]\)?\s*)?(?:\n|\*\*\s*)?([A-Za-zÀ-ú\s]+(?:\se\s[A-Za-zÀ-ú]+)?)/i);
@@ -66,48 +80,51 @@ export function parseWorkoutPlan(content: string): ParsedWorkoutDay[] | null {
       continue;
     }
     
-    // Parse exercises using the emoji markers
-    const exerciseBlocks = dayContent.split(/🏋️\s*(?:Exercício\s*\d+:?\s*)?/i).filter(block => block.trim());
+    // Parse exercises using the emoji markers and ignore the day preamble.
+    const firstExerciseIndex = dayContent.search(/🏋️\s*(?:\*\*)?\s*(?:Exercício\s*\d+:?\s*)?/i);
+    const exerciseText = firstExerciseIndex >= 0 ? dayContent.slice(firstExerciseIndex) : "";
+    const exerciseBlocks = exerciseText.split(/🏋️\s*(?:\*\*)?\s*(?:Exercício\s*\d+:?\s*)?/i).filter(block => block.trim());
     const exercises: ParsedWorkoutDay["exercises"] = [];
     
     for (const block of exerciseBlocks) {
-      if (!block.trim()) continue;
+      const cleanBlock = block.trim();
+      if (!cleanBlock) continue;
       
       // Extract exercise name (first line or before 📍)
       let name = "";
-      const nameMatch = block.match(/^(?:\*\*)?([^📍🧠⚠️🔁⏱️🔄\n*]+?)(?:\*\*)?(?:\n|📍)/);
+      const nameMatch = cleanBlock.match(/^(?:\*\*)?(?:Exercício\s*\d+:?\s*)?([^📍🧠⚠️🔁⏱️🔄\n*]+?)(?:\*\*)?(?:\n|📍|$)/i);
       if (nameMatch) {
         name = nameMatch[1].trim().replace(/^\*\*|\*\*$/g, "");
       }
       
-      if (!name || name.length < 3) continue;
+      if (!name || name.length < 3 || /^(segunda|terça|quarta|quinta|sexta|sábado|domingo|rotina|treino\s+da\s+semana)/i.test(name)) continue;
       
       // Extract equipment
-      const equipMatch = block.match(/📍\s*(?:Máquina|Equipamento)?:?\s*([^\n🧠]+)/i);
+      const equipMatch = cleanBlock.match(/📍\s*(?:Máquina|Equipamento)?:?\s*([^\n🧠]+)/i);
       const equipment = equipMatch?.[1]?.trim() || "Peso corporal";
       
       // Extract execution steps
-      const execMatch = block.match(/🧠\s*(?:Execução)?:?\s*([\s\S]*?)(?=🔁|⏱️|⚠️|🔄|$)/i);
+      const execMatch = cleanBlock.match(/🧠\s*(?:Execução)?:?\s*([\s\S]*?)(?=🔁|⏱️|⚠️|🔄|$)/i);
       const stepsText = execMatch?.[1] || "";
       const steps = stepsText
         .split(/[•\n]/)
-        .map(s => s.trim())
+        .map(s => s.trim().replace(/^\d+[.)]\s*/, ""))
         .filter(s => s && s.length > 3);
       
       // Extract sets
-      const setsMatch = block.match(/🔁\s*(?:Séries)?:?\s*(\d+x\d+[^\n⏱️⚠️🔄]*)/i);
+      const setsMatch = cleanBlock.match(/🔁\s*(?:Séries|Série)?:?\s*([^\n⏱️⚠️🔄]+)/i);
       const sets = setsMatch?.[1]?.trim() || "3x12";
       
       // Extract rest
-      const restMatch = block.match(/⏱️\s*(?:Descanso)?:?\s*([^\n⚠️🔄]+)/i);
+      const restMatch = cleanBlock.match(/⏱️\s*(?:Descanso)?:?\s*([^\n⚠️🔄]+)/i);
       const rest = restMatch?.[1]?.trim() || "60 segundos";
       
       // Extract common error
-      const errorMatch = block.match(/⚠️\s*(?:Erro comum)?:?\s*([^\n🔄]+)/i);
+      const errorMatch = cleanBlock.match(/⚠️\s*(?:Erro comum)?:?\s*([^\n🔄]+)/i);
       const commonError = errorMatch?.[1]?.trim() || "Executar sem controle";
       
       // Extract alternative
-      const altMatch = block.match(/🔄\s*(?:Alternativa)?:?\s*([^\n🏋️]+)/i);
+      const altMatch = cleanBlock.match(/🔄\s*(?:Alternativa)?:?\s*([^\n🏋️]+)/i);
       const alternative = altMatch?.[1]?.trim() || "Versão com peso corporal";
       
       exercises.push({
@@ -124,7 +141,7 @@ export function parseWorkoutPlan(content: string): ParsedWorkoutDay[] | null {
     
     if (exercises.length > 0) {
       days.push({
-        dayName: dayName + "-feira",
+        dayName,
         muscleGroup,
         exercises,
       });
