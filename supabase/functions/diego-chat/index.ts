@@ -122,11 +122,13 @@ PERFIL DO ALUNO:
 - Limitações: ${profile.limitacoes || "Nenhuma informada"}
 - Alimentação atual: ${profile.alimentacao || "Não informada"}
 
-INSTRUÇÕES ESPECIAIS:
-1. Monte treino APENAS para os dias: ${diasFormatados}
-2. Use a divisão inteligente baseada em ${numDias} dia(s) disponível(is)
-3. Defina um OBJETIVO ESPECÍFICO para cada dia (ex: "Força de pernas", "Hipertrofia de peito")
-4. Adapte os exercícios para ${profile.local === "academia" ? "equipamentos de academia" : "exercícios em casa com pouco ou nenhum equipamento"}
+INSTRUÇÕES ESPECIAIS (OBRIGATÓRIO CUMPRIR):
+1. ⚠️ CRÍTICO: Você DEVE gerar EXATAMENTE ${numDias} blocos de treino, UM PARA CADA DIA listado abaixo, NA ORDEM:
+${diasEspecificos.map((d: string, i: number) => `   ${i + 1}. ${dayNames[d] || d}`).join("\n")}
+2. NÃO pule nenhum dia. NÃO adicione dias extras. NÃO use "Treino A/B/C" como cabeçalho — use o NOME DO DIA DA SEMANA.
+3. Use a divisão inteligente baseada em ${numDias} dia(s) disponível(is)
+4. Defina um OBJETIVO ESPECÍFICO para cada dia (ex: "Força de pernas", "Hipertrofia de peito")
+5. Adapte os exercícios para ${profile.local === "academia" ? "equipamentos de academia" : "exercícios em casa com pouco ou nenhum equipamento"}
 ${profile.limitacoes ? `5. IMPORTANTE: Evite exercícios que possam agravar: ${profile.limitacoes}` : ""}
 
 ${type === "plan" ? "Monte um PLANO COMPLETO personalizado incluindo: 1) Rotina de treino semanal detalhada APENAS para os dias selecionados, com exercícios usando o formato estruturado obrigatório e OBJETIVO claro por dia. 2) Plano alimentar com café, almoço, jantar e lanches. 3) Dicas de rotina e hábitos." : "Responda à pergunta do aluno de forma personalizada."}`

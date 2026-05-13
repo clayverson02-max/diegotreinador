@@ -40,7 +40,16 @@ const formatScheduledDate = (dateStr: string): string => {
   return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 };
 
-export const TrainingPlanView = ({ workoutDays, selectedDays, onDayComplete }: TrainingPlanViewProps) => {
+const ORDERED_WEEKDAYS = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"];
+
+export const TrainingPlanView = ({ workoutDays: rawWorkoutDays, selectedDays, onDayComplete }: TrainingPlanViewProps) => {
+  // Garante UMA entrada por dia selecionado pelo usuário, ciclando os treinos se a IA gerou menos.
+  const workoutDays = (() => {
+    if (!selectedDays || selectedDays.length === 0) return rawWorkoutDays;
+    const sorted = [...selectedDays].sort((a, b) => ORDERED_WEEKDAYS.indexOf(a) - ORDERED_WEEKDAYS.indexOf(b));
+    return sorted.map((_, i) => rawWorkoutDays[i % Math.max(rawWorkoutDays.length, 1)]).filter(Boolean);
+  })();
+
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
   const { 
     progress, 
