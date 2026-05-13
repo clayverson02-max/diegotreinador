@@ -81,13 +81,32 @@ export const ExerciseCard = ({ exercise, index, showImage = false }: ExerciseCar
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+            <button
+              type="button"
+              onClick={generateImage}
+              className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors p-4"
+            >
               <ImageIcon size={32} />
-              <span className="text-xs">Imagem indisponível</span>
-            </div>
+              <span className="text-xs">Toque para gerar imagem</span>
+            </button>
           )}
         </div>
       )}
+
+      {/* Execução — destaque logo abaixo da imagem */}
+      <div className="mb-4 bg-primary/5 border border-primary/20 rounded-xl p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Brain size={18} className="text-primary" />
+          <span className="text-xs text-primary uppercase tracking-wide font-semibold">
+            Como fazer corretamente
+          </span>
+        </div>
+        <ol className="text-sm text-foreground space-y-2 list-decimal list-inside">
+          {exercise.execucao.map((step, i) => (
+            <li key={i} className="leading-relaxed">{step}</li>
+          ))}
+        </ol>
+      </div>
 
       {/* Details */}
       <div className="space-y-3">
@@ -97,22 +116,6 @@ export const ExerciseCard = ({ exercise, index, showImage = false }: ExerciseCar
           <div>
             <span className="text-xs text-muted-foreground uppercase tracking-wide">Máquina</span>
             <p className="text-sm text-foreground">{exercise.maquina}</p>
-          </div>
-        </div>
-
-        {/* Execução */}
-        <div className="flex items-start gap-3">
-          <Brain size={18} className="text-primary mt-0.5 shrink-0" />
-          <div>
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Execução</span>
-            <ul className="text-sm text-foreground mt-1 space-y-1">
-              {exercise.execucao.map((step, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-primary">•</span>
-                  {step}
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
 
