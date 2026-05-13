@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import { Message, UserProfile } from "@/types/diego";
 import { ChatMessage } from "./ChatMessage";
 import { TrainingPlanView } from "./TrainingPlanView";
@@ -25,7 +25,7 @@ export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProp
   const [workoutDays, setWorkoutDays] = useState<ParsedWorkoutDay[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const getStableWorkoutPlan = (): ParsedWorkoutDay[] => buildReliableWorkoutPlan(profile);
+  const getStableWorkoutPlan = useCallback((): ParsedWorkoutDay[] => buildReliableWorkoutPlan(profile), [profile]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -80,7 +80,7 @@ export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProp
     };
 
     generatePlan();
-  }, [profile]);
+  }, [profile, getStableWorkoutPlan]);
 
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
