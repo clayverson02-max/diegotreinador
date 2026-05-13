@@ -224,6 +224,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
                   { value: "quinta", label: "Quinta-feira" },
                   { value: "sexta", label: "Sexta-feira" },
                   { value: "sabado", label: "Sábado" },
+                  { value: "domingo", label: "Domingo" },
                 ].map((dia) => (
                   <button
                     key={dia.value}

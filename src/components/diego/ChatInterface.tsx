@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import { Message, UserProfile } from "@/types/diego";
 import { ChatMessage } from "./ChatMessage";
 import { TrainingPlanView } from "./TrainingPlanView";
 import { DiegoAvatar } from "./DiegoAvatar";
 import { Send, Dumbbell, MessageCircle, ArrowRight, Sparkles } from "lucide-react";
 import { streamDiegoChat } from "@/lib/diegoAI";
-import { parseWorkoutPlan, hasWorkoutPlan, ParsedWorkoutDay } from "@/lib/parseWorkoutPlan";
+import { ParsedWorkoutDay } from "@/lib/parseWorkoutPlan";
+import { buildReliableWorkoutPlan } from "@/lib/workoutPlanBuilder";
 import { toast } from "sonner";
 
 interface ChatInterfaceProps {
@@ -23,6 +24,8 @@ export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProp
   const [viewMode, setViewMode] = useState<ViewMode>("chat");
   const [workoutDays, setWorkoutDays] = useState<ParsedWorkoutDay[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const getStableWorkoutPlan = useCallback((): ParsedWorkoutDay[] => buildReliableWorkoutPlan(profile), [profile]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -61,28 +64,23 @@ export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProp
         onDone: () => {
           setIsTyping(false);
           setPlanGenerated(true);
-          
-          // Try to parse workout plan from response
-          if (hasWorkoutPlan(fullContent)) {
-            const parsed = parseWorkoutPlan(fullContent);
-            if (parsed && parsed.length > 0) {
-              setWorkoutDays(parsed);
-            }
-          }
+          setWorkoutDays(getStableWorkoutPlan());
         },
         onError: (error) => {
           setIsTyping(false);
           toast.error(error);
+          setPlanGenerated(true);
+          setWorkoutDays(getStableWorkoutPlan());
           setMessages([{
             ...greetingMessage,
-            content: "Desculpe, tive um problema ao gerar seu plano. Tente novamente em alguns instantes.",
+            content: "Seu treino foi montado com segurança. Vá em Meus Treinos para começar.",
           }]);
         },
       });
     };
 
     generatePlan();
-  }, [profile]);
+  }, [profile, getStableWorkoutPlan]);
 
   const handleSend = async () => {
     if (!input.trim() || isTyping) return;
@@ -131,13 +129,7 @@ export const ChatInterface = ({ profile, onSwitchToTraining }: ChatInterfaceProp
       onDone: () => {
         setIsTyping(false);
         
-        // Check if new workout plan was generated
-        if (hasWorkoutPlan(fullContent)) {
-          const parsed = parseWorkoutPlan(fullContent);
-          if (parsed && parsed.length > 0) {
-            setWorkoutDays(parsed);
-          }
-        }
+        setWorkoutDays(getStableWorkoutPlan());
       },
       onError: (error) => {
         setIsTyping(false);
