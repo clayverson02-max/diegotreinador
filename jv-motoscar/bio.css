@@ -30,3 +30,16 @@ h2 { margin:0; font-size:12px; line-height:1.4; font-weight:600; }
 .instagram { display:block; text-align:center; color:#74816d; font-size:11px; margin-top:16px; padding:10px; }
 @media(max-width:480px) { .bio { margin:0 auto; border:0; border-radius:0; min-height:100dvh; box-shadow:none; } .brand-image { margin:0; } }
 @media(max-width:350px) { h1 { font-size:23px; } .links,.deliveries { padding-inline:17px; } .contact-link,.location-link { padding:14px; font-size:13px; } h2 { font-size:11px; } }
+
+a[href*="lovable.dev"],
+iframe[src*="lovable.dev"],
+div[style*="Edit with Lovable"],
+.lovable-badge,
+#lovable-badge {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  z-index: -9999 !important;
+}
