@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101710">
+  <meta name="theme-color" content="#f6f7f2">
   <meta name="description" content="Motos e carros em Caucaia, CE. Consulte o estoque da JTVM Motos Car pelo WhatsApp e abra a rota para a loja no Centro.">
   <meta property="og:title" content="JTVM Motos Car | Motos e carros em Caucaia">
   <meta property="og:description" content="Consulte os veículos disponíveis, fale com a loja e abra a rota para a JTVM Motos Car.">
@@ -27,59 +27,25 @@
   <script type="module" src="/jv-motoscar/bio.js"></script>
 </head>
 <body>
-  <main class="shell">
-    <header class="hero">
-      <div class="masthead">
-        <a class="brand" href="https://www.instagram.com/jvmotoscar_caucaia/" aria-label="JTVM Motos Car no Instagram">
-          <span class="brand-mark">JTVM</span><span>MOTOS <span class="accent">CAR</span><small>CAUCAIA · CE</small></span>
-        </a>
-        <a class="icon-link" href="https://www.instagram.com/jvmotoscar_caucaia/" aria-label="Abrir Instagram da JTVM Motos Car"><span class="ig-icon" aria-hidden="true"></span></a>
-      </div>
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow">MOTOS E CARROS EM CAUCAIA</p>
-          <h1>Encontre seu<br>próximo <em>veículo.</em></h1>
-          <p class="intro">Diga o que você procura. A equipe te mostra as opções disponíveis e ajuda a organizar sua visita.</p>
-        </div>
-        <section class="contact" aria-labelledby="contact-title">
-          <h2 id="contact-title">O que você procura?</h2>
-          <div class="choice" aria-label="Tipo de veículo">
-            <button type="button" data-interest="moto" aria-pressed="false">Quero uma moto</button>
-            <button type="button" data-interest="carro" aria-pressed="false">Quero um carro</button>
-          </div>
-          <p class="contact-label">Fale com a loja no WhatsApp</p>
-          <div class="contacts">
-            <a class="whatsapp primary" data-phone="5585986549563" href="https://wa.me/5585986549563"><span>Atendimento 1<small>(85) 98654-9563</small></span><span aria-hidden="true">↗</span></a>
-            <a class="whatsapp" data-phone="5585982366667" href="https://wa.me/5585982366667"><span>Atendimento 2<small>(85) 98236-6667</small></span><span aria-hidden="true">↗</span></a>
-          </div>
-        </section>
-      </div>
+  <main class="bio">
+    <header class="profile">
+      <div class="brand" aria-label="JTVM Motos Car"><span class="brand-mark">JTVM</span><span>MOTOS <b>CAR</b></span></div>
+      <h1>Seu próximo carro ou moto<br>pode estar aqui.</h1>
+      <p>Oi! Que bom te ver por aqui.<br>Chama a gente ou vem conhecer a loja. 🤝</p>
     </header>
 
-    <section class="location" aria-labelledby="location-title">
-      <div>
-        <p class="eyebrow">LOJA FÍSICA</p>
-        <h2 id="location-title">Venha até a loja</h2>
-        <address>Rua Coronel Correia, 2364 · Centro<br>Caucaia – CE · 61600-004</address>
-      </div>
-      <a class="route" href="https://www.google.com/maps/dir/?api=1&amp;destination=Rua%20Coronel%20Correia%2C%202364%2C%20Centro%2C%20Caucaia%20-%20CE%2C%2061600-004">Traçar rota no Google Maps <span aria-hidden="true">↗</span></a>
-    </section>
+    <nav class="links" aria-label="Fale com a loja">
+      <a class="contact-link" data-phone="5585986549563" href="https://wa.me/5585986549563"><span>Vamos conversar no WhatsApp<small>(85) 98654-9563</small></span><span aria-hidden="true">↗</span></a>
+      <a class="contact-link" data-phone="5585982366667" href="https://wa.me/5585982366667"><span>Nosso outro WhatsApp<small>(85) 98236-6667</small></span><span aria-hidden="true">↗</span></a>
+      <a class="location-link" href="https://www.google.com/maps/dir/?api=1&amp;destination=Rua%20Coronel%20Correia%2C%202364%2C%20Centro%2C%20Caucaia%20-%20CE%2C%2061600-004"><span>Como chegar à loja<small>Rua Coronel Correia, 2364 · Centro<br>Caucaia – CE · 61600-004</small></span><span aria-hidden="true">↗</span></a>
+    </nav>
 
-    <section class="deliveries" aria-labelledby="deliveries-title" hidden>
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">ENTREGAS DA JV MOTOSCAR</p>
-          <h2 id="deliveries-title">Quem já saiu de chave na mão</h2>
-        </div>
-        <button type="button" class="reel-toggle" aria-pressed="false">Pausar</button>
-      </div>
-      <div class="reel" tabindex="0" aria-label="Fotos de clientes que já compraram na loja">
-        <div class="reel-group"></div>
-      </div>
-      <p class="gallery-note">Fotos de entregas realizadas. Consulte o estoque atual pelo WhatsApp.</p>
-    </section>
+    <div class="deliveries" hidden>
+      <div class="gallery-head"><h2>Olha quem já passou por aqui 💚</h2><button type="button" class="reel-toggle" aria-pressed="false">Pausar</button></div>
+      <div class="reel" tabindex="0" aria-label="Fotos de clientes na entrega de seus veículos"><div class="reel-group"></div></div>
+    </div>
 
-    <footer class="foot"><span>JTVM Motos Car · Caucaia, CE</span><a href="https://www.instagram.com/jvmotoscar_caucaia/">@jvmotoscar_caucaia <span aria-hidden="true">↗</span></a></footer>
+    <a class="instagram" href="https://www.instagram.com/jvmotoscar_caucaia/">@jvmotoscar_caucaia</a>
   </main>
 </body>
 </html>

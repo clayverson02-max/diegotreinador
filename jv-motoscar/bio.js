@@ -1,22 +1,7 @@
-const contacts = document.querySelectorAll("[data-phone]");
-const interests = document.querySelectorAll("[data-interest]");
-
-function selectInterest(interest) {
-  for (const button of interests) {
-    button.setAttribute("aria-pressed", String(button.dataset.interest === interest));
-  }
-  const message = interest
-    ? `Olá! Vim pelo Instagram da JTVM Motos Car e estou procurando ${interest === "moto" ? "uma moto" : "um carro"}. Quais opções vocês têm disponíveis?`
-    : "Olá! Vim pelo Instagram da JTVM Motos Car. Quais motos e carros vocês têm disponíveis?";
-  for (const link of contacts) {
-    link.href = `https://wa.me/${link.dataset.phone}?text=${encodeURIComponent(message)}`;
-  }
+const message = "Oi! Vim pelo Instagram e queria conhecer as motos e os carros que vocês têm na loja.";
+for (const link of document.querySelectorAll("[data-phone]")) {
+  link.href = `https://wa.me/${link.dataset.phone}?text=${encodeURIComponent(message)}`;
 }
-
-for (const button of interests) {
-  button.addEventListener("click", () => selectInterest(button.dataset.interest));
-}
-selectInterest();
 
 const photos = import.meta.glob(
   "/src/assets/jv-clientes/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}",
