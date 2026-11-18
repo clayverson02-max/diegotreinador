@@ -6,8 +6,8 @@ function selectInterest(interest) {
     button.setAttribute("aria-pressed", String(button.dataset.interest === interest));
   }
   const message = interest
-    ? `Olá! Vim pelo Instagram da JV MotosCar e estou procurando ${interest === "moto" ? "uma moto" : "um carro"}. Quais opções vocês têm disponíveis?`
-    : "Olá! Vim pelo Instagram da JV MotosCar. Quais motos e carros vocês têm disponíveis?";
+    ? `Olá! Vim pelo Instagram da JTVM Motos Car e estou procurando ${interest === "moto" ? "uma moto" : "um carro"}. Quais opções vocês têm disponíveis?`
+    : "Olá! Vim pelo Instagram da JTVM Motos Car. Quais motos e carros vocês têm disponíveis?";
   for (const link of contacts) {
     link.href = `https://wa.me/${link.dataset.phone}?text=${encodeURIComponent(message)}`;
   }
@@ -31,7 +31,7 @@ const toggle = document.querySelector(".reel-toggle");
 for (const [index, url] of Object.values(photos).entries()) {
   const picture = document.createElement("img");
   picture.src = url;
-  picture.alt = `Registro de entrega da JV MotosCar, foto ${index + 1}`;
+  picture.alt = `Registro de entrega da JTVM Motos Car, foto ${index + 1}`;
   picture.width = 1254;
   picture.height = 1254;
   picture.loading = "lazy";
