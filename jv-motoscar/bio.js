@@ -19,7 +19,7 @@ for (const button of interests) {
 selectInterest();
 
 const photos = import.meta.glob(
-  ["/WhatsApp Image 2026-11-17 at 19.48.*.jpeg", "/src/assets/jv-clientes/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}"],
+  "/src/assets/jv-clientes/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}",
   { eager: true, query: "?url", import: "default" },
 );
 
