@@ -16,7 +16,7 @@ const toggle = document.querySelector(".reel-toggle");
 for (const [index, url] of Object.values(photos).entries()) {
   const picture = document.createElement("img");
   picture.src = url;
-  picture.alt = `Registro de entrega da JTVM Motos Car, foto ${index + 1}`;
+  picture.alt = `Registro de entrega da JV Motos, foto ${index + 1}`;
   picture.width = 1254;
   picture.height = 1254;
   picture.loading = "lazy";
